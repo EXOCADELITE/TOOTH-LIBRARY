@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FP1 / FP3 Dental Articulation Viewer</title>
+  <style>
+    html,body { margin:0; padding:0; background:#fff; }
+    body { padding:24px 0; }
+  </style>
+</head>
+<body>
+<!--
+  FP1 / FP3 Dental Articulation Viewer — Carrd-compatible single embed
+  -------------------------------------------------------------------
+  • Two independent Three.js scenes side by side (FP1 left, FP3 right)
+  • Each scene loads its Upper + Lower GLB into the SAME scene
+  • Toggle buttons only flip object.visible — never touch position/rotation/scale
+  • Default state: both sides show Upper + Lower together (Both)
+  • Yellow Exocad-style enamel: color [0.78,0.60,0.05], metalness 0.0, roughness 0.38
+  • Transparent background, drop-shadow for depth
+  • Uses esm.sh import map shim friendly form (single CDN, no bundler)
+
+  Drop this entire block into a Carrd "Embed" element. Nothing else required.
+-->
+
+<div id="tl-viewer-root" style="width:100%;max-width:1200px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;text-align:center;color:#222;">
+  <div style="display:flex;gap:24px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
+    <!-- FP1 -->
+    <div style="flex:1;min-width:320px;max-width:560px;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:10px;">FP1</div>
+      <div id="tl-stage-FP1"
+           style="position:relative;width:100%;height:560px;background:transparent;filter:drop-shadow(0 24px 28px rgba(0,0,0,0.55));">
+        <canvas id="tl-canvas-FP1" style="display:block;width:100%;height:100%;background:transparent;touch-action:none;"></canvas>
+        <div id="tl-spinner-FP1" style="position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;">
+          <div class="tl-spin" style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(0,0,0,0.12);border-top-color:#8c7bff;animation:tlspin 0.9s linear infinite;"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px;">FP1 View</div>
+        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+          <button class="tl-btn" data-side="FP1" data-view="upper" style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#fff;color:#111;cursor:pointer;font:600 13px/1 inherit;">Upper</button>
+          <button class="tl-btn" data-side="FP1" data-view="lower" style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#fff;color:#111;cursor:pointer;font:600 13px/1 inherit;">Lower</button>
+          <button class="tl-btn" data-side="FP1" data-view="both"  style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#111;color:#fff;cursor:pointer;font:600 13px/1 inherit;">Both</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FP3 -->
+    <div style="flex:1;min-width:320px;max-width:560px;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:10px;">FP3</div>
+      <div id="tl-stage-FP3"
+           style="position:relative;width:100%;height:560px;background:transparent;filter:drop-shadow(0 24px 28px rgba(0,0,0,0.55));">
+        <canvas id="tl-canvas-FP3" style="display:block;width:100%;height:100%;background:transparent;touch-action:none;"></canvas>
+        <div id="tl-spinner-FP3" style="position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;">
+          <div class="tl-spin" style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(0,0,0,0.12);border-top-color:#8c7bff;animation:tlspin 0.9s linear infinite;"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px;">FP3 View</div>
+        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+          <button class="tl-btn" data-side="FP3" data-view="upper" style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#fff;color:#111;cursor:pointer;font:600 13px/1 inherit;">Upper</button>
+          <button class="tl-btn" data-side="FP3" data-view="lower" style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#fff;color:#111;cursor:pointer;font:600 13px/1 inherit;">Lower</button>
+          <button class="tl-btn" data-side="FP3" data-view="both"  style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#111;color:#fff;cursor:pointer;font:600 13px/1 inherit;">Both</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="tl-status" style="margin-top:14px;font-size:13px;color:#444;">FP1 • BOTH | FP3 • BOTH</div>
+</div>
+
+<style>@keyframes tlspin { to { transform: rotate(360deg); } }</style>
+
+<script type="module">
+  import * as THREE from 'https://esm.sh/three@0.169.0';
+  import { GLTFLoader }   from 'https://esm.sh/three@0.169.0/examples/jsm/loaders/GLTFLoader.js';
+  import { OrbitControls } from 'https://esm.sh/three@0.169.0/examples/jsm/controls/OrbitControls.js';
+  import { RoomEnvironment } from 'https://esm.sh/three@0.169.0/examples/jsm/environments/RoomEnvironment.js';
+
+  const URLS = {
+    FP1: {
+      upper: 'https://exocadelite.github.io/TOOTH-LIBRARY/Upper%20FP1.glb',
+      lower: 'https://exocadelite.github.io/TOOTH-LIBRARY/lower%20FP1.glb'   // note: lowercase 'lower'
+    },
+    FP3: {
+      upper: 'https://exocadelite.github.io/TOOTH-LIBRARY/Upper%20FP3.glb',
+      lower: 'https://exocadelite.github.io/TOOTH-LIBRARY/Lower%20FP3.glb'
+    }
+  };
+
+  // Approved enamel material — color factor [0.78, 0.60, 0.05] interpreted as a
+  // linear-space PBR baseColorFactor (matches glTF spec / model-viewer behavior).
+  const ENAMEL_COLOR     = (new THREE.Color()).setRGB(0.78, 0.60, 0.05, THREE.LinearSRGBColorSpace);
+  const ENAMEL_METALNESS = 0.0;
+  const ENAMEL_ROUGHNESS = 0.38;
+
+  const statusEl = document.getElementById('tl-status');
+  const current  = { FP1: 'both', FP3: 'both' };
+
+  function setStatus(msg) {
+    if (msg) { statusEl.textContent = msg; return; }
+    statusEl.textContent = `FP1 • ${current.FP1.toUpperCase()} | FP3 • ${current.FP3.toUpperCase()}`;
+  }
+  function setError(side, view) {
+    statusEl.style.color = '#b00020';
+    statusEl.textContent = `${side} ${view.toUpperCase()} failed to load. Check GitHub filename.`;
+  }
+
+  function applyEnamel(root) {
+    root.traverse((o) => {
+      if (!o.isMesh) return;
+      o.material = new THREE.MeshStandardMaterial({
+        color: ENAMEL_COLOR,
+        metalness: ENAMEL_METALNESS,
+        roughness: ENAMEL_ROUGHNESS
+      });
+      o.castShadow = false;
+      o.receiveShadow = false;
+    });
+  }
+
+  function makeScene(side) {
+    const canvas   = document.getElementById('tl-canvas-' + side);
+    const stage    = document.getElementById('tl-stage-'  + side);
+    const spinner  = document.getElementById('tl-spinner-' + side);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas, antialias: true, alpha: true, premultipliedAlpha: false
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NoToneMapping; // keep "neutral" feel; we control via exposure
+    renderer.toneMappingExposure = 0.85;
+    const w0 = stage.clientWidth, h0 = stage.clientHeight;
+    renderer.setSize(w0, h0, false);
+    renderer.setClearColor(0x000000, 0); // transparent
+
+    const scene = new THREE.Scene();
+
+    // Subtle env for soft reflections — keeps glossy enamel from looking flat
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    // Approved lighting: moderate ambient + key + fill
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const key = new THREE.DirectionalLight(0xffffff, 1.05);
+    key.position.set(2, 4, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.45);
+    fill.position.set(-3, 2, -2);
+    scene.add(fill);
+
+    const camera = new THREE.PerspectiveCamera(35, w0 / Math.max(1, h0), 0.01, 5000);
+    camera.position.set(0, 0, 200); // re-framed once models load
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enablePan = false;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.0;
+
+    // Resize follows the stage element
+    const ro = new ResizeObserver(() => {
+      const w = stage.clientWidth, h = stage.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / Math.max(1, h);
+      camera.updateProjectionMatrix();
+    });
+    ro.observe(stage);
+
+    function tick() {
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    return { renderer, scene, camera, controls, spinner, stage };
+  }
+
+  function frameToCombined(ctx, group) {
+    // Frame camera around the combined exported scene WITHOUT touching the models.
+    const box = new THREE.Box3().setFromObject(group);
+    if (box.isEmpty()) return;
+    const size = new THREE.Vector3(); box.getSize(size);
+    const center = new THREE.Vector3(); box.getCenter(center);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = ctx.camera.fov * Math.PI / 180;
+    const dist = (maxDim / 2 / Math.tan(fov / 2)) * 1.6;
+    // Pleasant 3/4 front view
+    const dir = new THREE.Vector3(0, 0.25, 1).normalize();
+    ctx.camera.position.copy(center).addScaledVector(dir, dist);
+    ctx.camera.near = Math.max(0.01, dist / 500);
+    ctx.camera.far  = dist * 50;
+    ctx.camera.updateProjectionMatrix();
+    ctx.controls.target.copy(center);
+    ctx.controls.minDistance = dist * 0.4;
+    ctx.controls.maxDistance = dist * 3.0;
+    ctx.controls.update();
+  }
+
+  async function loadSide(side) {
+    const ctx = makeScene(side);
+    const loader = new GLTFLoader();
+
+    // Container group — purely for traversal/framing. We DO NOT move it.
+    const group = new THREE.Group();
+    ctx.scene.add(group);
+
+    function loadOne(url, label) {
+      return new Promise((resolve) => {
+        loader.load(
+          url,
+          (gltf) => {
+            const root = gltf.scene || gltf.scenes[0];
+            applyEnamel(root);
+            // IMPORTANT: do not modify position/rotation/scale of `root`.
+            group.add(root);
+            resolve(root);
+          },
+          undefined,
+          (err) => {
+            console.warn(`[${side} ${label}] load failed`, err);
+            setError(side, label);
+            resolve(null);
+          }
+        );
+      });
+    }
+
+    const [upper, lower] = await Promise.all([
+      loadOne(URLS[side].upper, 'upper'),
+      loadOne(URLS[side].lower, 'lower')
+    ]);
+
+    // Default state = Both
+    if (upper) upper.visible = true;
+    if (lower) lower.visible = true;
+
+    // Frame the camera around the COMBINED group only (no model transforms).
+    frameToCombined(ctx, group);
+
+    ctx.spinner.style.display = 'none';
+
+    return { upper, lower, ctx };
+  }
+
+  const sides = {};
+
+  // Boot both sides in parallel
+  Promise.all([loadSide('FP1'), loadSide('FP3')]).then(([fp1, fp3]) => {
+    sides.FP1 = fp1;
+    sides.FP3 = fp3;
+    applyView('FP1', 'both');
+    applyView('FP3', 'both');
+  });
+
+  function applyView(side, view) {
+    const s = sides[side];
+    if (!s) return;
+    if (s.upper) s.upper.visible = (view === 'upper' || view === 'both');
+    if (s.lower) s.lower.visible = (view === 'lower' || view === 'both');
+    current[side] = view;
+    updateButtons(side);
+    setStatus();
+  }
+
+  function updateButtons(side) {
+    document.querySelectorAll(`.tl-btn[data-side="${side}"]`).forEach((btn) => {
+      const active = btn.getAttribute('data-view') === current[side];
+      btn.style.background = active ? '#111' : '#fff';
+      btn.style.color      = active ? '#fff' : '#111';
+    });
+  }
+
+  document.querySelectorAll('.tl-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const side = btn.getAttribute('data-side');
+      const view = btn.getAttribute('data-view');
+      // FP1 buttons only affect FP1, FP3 buttons only affect FP3.
+      applyView(side, view);
+    });
+  });
+
+  // Initial button paint
+  updateButtons('FP1');
+  updateButtons('FP3');
+  setStatus();
+</script>
+</body></html>

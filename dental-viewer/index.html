@@ -4,10 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FP1 / FP3 Dental Articulation Viewer</title>
-  <style>
-    html,body { margin:0; padding:0; background:#fff; }
-    body { padding:24px 0; }
-  </style>
+  <style>html,body{margin:0;padding:0;background:#fff;}body{padding:24px 0;}</style>
 </head>
 <body>
 <!--
@@ -112,6 +109,23 @@
   function applyEnamel(root) {
     root.traverse((o) => {
       if (!o.isMesh) return;
+      const geom = o.geometry;
+      // Source GLBs were converted from STL by STL2GLTF and ship with POSITION only —
+      // no NORMAL attribute. Without normals everything renders as a flat silhouette.
+      // Compute vertex normals so the lighting can show cusps, grooves, line angles.
+      if (geom && !geom.attributes.normal) {
+        // Use flat normals for crisp CAD-style line angles — STL is faceted anyway.
+        // Switch to computeVertexNormals() for a smoother look.
+        if (geom.index) {
+          // For indexed geometry, flat shading needs non-indexed first.
+          const ng = geom.toNonIndexed();
+          ng.computeVertexNormals();
+          o.geometry.dispose();
+          o.geometry = ng;
+        } else {
+          geom.computeVertexNormals();
+        }
+      }
       o.material = new THREE.MeshPhysicalMaterial({
         color: ENAMEL_COLOR,
         metalness: ENAMEL_METALNESS,
@@ -122,7 +136,8 @@
         sheenColor: ENAMEL_SHEEN_COLOR,
         sheenRoughness: 0.55,
         reflectivity: 0.6,
-        envMapIntensity: 1.15
+        envMapIntensity: 0.45,   // toned down so the directional key actually creates contrast
+        flatShading: false
       });
       o.castShadow = true;
       o.receiveShadow = true;
@@ -215,9 +230,23 @@
     const maxDim = Math.max(size.x, size.y, size.z);
     const fov = ctx.camera.fov * Math.PI / 180;
     const dist = (maxDim / 2 / Math.tan(fov / 2)) * 1.6;
-    // Pleasant 3/4 front view
-    const dir = new THREE.Vector3(0, 0.25, 1).normalize();
-    ctx.camera.position.copy(center).addScaledVector(dir, dist);
+
+    // STL/dental exports vary in axis convention. We pick the
+    // shortest bounding-box axis as the "front" (depth) direction
+    // — dental arches are wide (mesio-distal) and tall (occluso-gingival)
+    // but shallow (buccal-lingual). That heuristic gives a clean 3/4 view
+    // no matter which axis the exporter used.
+    const ax = [
+      { axis: 'x', len: size.x, dir: new THREE.Vector3(1, 0, 0) },
+      { axis: 'y', len: size.y, dir: new THREE.Vector3(0, 1, 0) },
+      { axis: 'z', len: size.z, dir: new THREE.Vector3(0, 0, 1) }
+    ].sort((a, b) => a.len - b.len);
+    const frontDir = ax[0].dir.clone();
+    // Bias toward an above-front angle: blend with world-up component.
+    const up = new THREE.Vector3(0, 1, 0);
+    const finalDir = frontDir.clone().multiplyScalar(0.85).addScaledVector(up, 0.4).normalize();
+
+    ctx.camera.position.copy(center).addScaledVector(finalDir, dist);
     ctx.camera.near = Math.max(0.01, dist / 500);
     ctx.camera.far  = dist * 50;
     ctx.camera.updateProjectionMatrix();

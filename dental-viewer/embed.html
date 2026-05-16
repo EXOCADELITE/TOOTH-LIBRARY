@@ -12,49 +12,53 @@
   Drop this entire block into a Carrd "Embed" element. Nothing else required.
 -->
 
-<div id="tl-viewer-root" style="width:100%;max-width:1200px;margin:0 auto;background:transparent;font-family:Arial,Helvetica,sans-serif;text-align:center;color:#222;">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+<div id="tl-viewer-root" style="width:100%;max-width:1200px;margin:0 auto;background:transparent;font-family:'Inter',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;text-align:center;color:#f5f5f5;">
   <div style="display:flex;gap:24px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
     <!-- FP1 -->
     <div style="flex:1;min-width:320px;max-width:560px;">
-      <div style="font-size:16px;font-weight:700;margin-bottom:10px;">FP1</div>
+      <div style="font-size:30px;font-weight:300;letter-spacing:0.32em;margin-bottom:14px;color:#ffffff;text-transform:uppercase;">FP1</div>
       <div id="tl-stage-FP1"
            style="position:relative;width:100%;height:560px;background:transparent;filter:drop-shadow(0 24px 28px rgba(0,0,0,0.55));">
         <canvas id="tl-canvas-FP1" style="display:block;width:100%;height:100%;background:transparent;touch-action:none;"></canvas>
         <div id="tl-spinner-FP1" style="position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;">
-          <div class="tl-spin" style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(0,0,0,0.12);border-top-color:#8c7bff;animation:tlspin 0.9s linear infinite;"></div>
+          <div class="tl-spin" style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,0.18);border-top-color:#f6c12c;animation:tlspin 0.9s linear infinite;"></div>
         </div>
       </div>
-      <div style="margin-top:16px;">
-        <div style="font-size:14px;font-weight:700;margin-bottom:8px;">FP1 View</div>
-        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-          <button class="tl-btn" data-side="FP1" data-view="upper" style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#fff;color:#111;cursor:pointer;font:600 13px/1 inherit;">Upper</button>
-          <button class="tl-btn" data-side="FP1" data-view="lower" style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#fff;color:#111;cursor:pointer;font:600 13px/1 inherit;">Lower</button>
-          <button class="tl-btn" data-side="FP1" data-view="both"  style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#111;color:#fff;cursor:pointer;font:600 13px/1 inherit;">Both</button>
+      <div style="margin-top:18px;">
+        <div style="font-size:11px;font-weight:400;letter-spacing:0.28em;margin-bottom:10px;color:rgba(255,255,255,0.55);text-transform:uppercase;">FP1 View</div>
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+          <button class="tl-btn" data-side="FP1" data-view="upper" style="padding:9px 18px;border:1px solid rgba(255,255,255,0.22);border-radius:999px;background:transparent;color:rgba(255,255,255,0.78);cursor:pointer;font:500 12px/1 inherit;letter-spacing:0.14em;text-transform:uppercase;transition:all .18s ease;">Upper</button>
+          <button class="tl-btn" data-side="FP1" data-view="lower" style="padding:9px 18px;border:1px solid rgba(255,255,255,0.22);border-radius:999px;background:transparent;color:rgba(255,255,255,0.78);cursor:pointer;font:500 12px/1 inherit;letter-spacing:0.14em;text-transform:uppercase;transition:all .18s ease;">Lower</button>
+          <button class="tl-btn" data-side="FP1" data-view="both"  style="padding:9px 18px;border:1px solid #ffffff;border-radius:999px;background:#ffffff;color:#0a0a0a;cursor:pointer;font:600 12px/1 inherit;letter-spacing:0.14em;text-transform:uppercase;transition:all .18s ease;">Both</button>
         </div>
       </div>
     </div>
 
     <!-- FP3 -->
     <div style="flex:1;min-width:320px;max-width:560px;">
-      <div style="font-size:16px;font-weight:700;margin-bottom:10px;">FP3</div>
+      <div style="font-size:30px;font-weight:300;letter-spacing:0.32em;margin-bottom:14px;color:#ffffff;text-transform:uppercase;">FP3</div>
       <div id="tl-stage-FP3"
            style="position:relative;width:100%;height:560px;background:transparent;filter:drop-shadow(0 24px 28px rgba(0,0,0,0.55));">
         <canvas id="tl-canvas-FP3" style="display:block;width:100%;height:100%;background:transparent;touch-action:none;"></canvas>
         <div id="tl-spinner-FP3" style="position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;">
-          <div class="tl-spin" style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(0,0,0,0.12);border-top-color:#8c7bff;animation:tlspin 0.9s linear infinite;"></div>
+          <div class="tl-spin" style="width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,0.18);border-top-color:#f6c12c;animation:tlspin 0.9s linear infinite;"></div>
         </div>
       </div>
-      <div style="margin-top:16px;">
-        <div style="font-size:14px;font-weight:700;margin-bottom:8px;">FP3 View</div>
-        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-          <button class="tl-btn" data-side="FP3" data-view="upper" style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#fff;color:#111;cursor:pointer;font:600 13px/1 inherit;">Upper</button>
-          <button class="tl-btn" data-side="FP3" data-view="lower" style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#fff;color:#111;cursor:pointer;font:600 13px/1 inherit;">Lower</button>
-          <button class="tl-btn" data-side="FP3" data-view="both"  style="padding:10px 18px;border:1px solid #222;border-radius:999px;background:#111;color:#fff;cursor:pointer;font:600 13px/1 inherit;">Both</button>
+      <div style="margin-top:18px;">
+        <div style="font-size:11px;font-weight:400;letter-spacing:0.28em;margin-bottom:10px;color:rgba(255,255,255,0.55);text-transform:uppercase;">FP3 View</div>
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+          <button class="tl-btn" data-side="FP3" data-view="upper" style="padding:9px 18px;border:1px solid rgba(255,255,255,0.22);border-radius:999px;background:transparent;color:rgba(255,255,255,0.78);cursor:pointer;font:500 12px/1 inherit;letter-spacing:0.14em;text-transform:uppercase;transition:all .18s ease;">Upper</button>
+          <button class="tl-btn" data-side="FP3" data-view="lower" style="padding:9px 18px;border:1px solid rgba(255,255,255,0.22);border-radius:999px;background:transparent;color:rgba(255,255,255,0.78);cursor:pointer;font:500 12px/1 inherit;letter-spacing:0.14em;text-transform:uppercase;transition:all .18s ease;">Lower</button>
+          <button class="tl-btn" data-side="FP3" data-view="both"  style="padding:9px 18px;border:1px solid #ffffff;border-radius:999px;background:#ffffff;color:#0a0a0a;cursor:pointer;font:600 12px/1 inherit;letter-spacing:0.14em;text-transform:uppercase;transition:all .18s ease;">Both</button>
         </div>
       </div>
     </div>
   </div>
-  <div id="tl-status" style="margin-top:14px;font-size:13px;color:#444;">FP1 • BOTH | FP3 • BOTH</div>
+  <div id="tl-status" style="margin-top:18px;font-size:11px;letter-spacing:0.24em;color:rgba(255,255,255,0.45);text-transform:uppercase;">FP1 • BOTH&nbsp;&nbsp;|&nbsp;&nbsp;FP3 • BOTH</div>
 </div>
 
 <style>@keyframes tlspin { to { transform: rotate(360deg); } }</style>
@@ -76,8 +80,8 @@
     }
   };
 
-  // Exocad-style enamel — deeper saturated yellow, glossy clearcoat, strong shadow contrast.
-  const ENAMEL_COLOR     = (new THREE.Color()).setRGB(0.95, 0.62, 0.04, THREE.LinearSRGBColorSpace);
+  // Bright Exocad gold — matches reference yellow on black background.
+  const ENAMEL_COLOR     = (new THREE.Color()).setRGB(1.00, 0.72, 0.05, THREE.LinearSRGBColorSpace);
   const ENAMEL_METALNESS = 0.0;
   const ENAMEL_ROUGHNESS = 0.30;
   const ENAMEL_CLEARCOAT = 0.65;
@@ -89,10 +93,10 @@
 
   function setStatus(msg) {
     if (msg) { statusEl.textContent = msg; return; }
-    statusEl.textContent = `FP1 • ${current.FP1.toUpperCase()} | FP3 • ${current.FP3.toUpperCase()}`;
+    statusEl.textContent = `FP1 • ${current.FP1.toUpperCase()}  |  FP3 • ${current.FP3.toUpperCase()}`;
   }
   function setError(side, view) {
-    statusEl.style.color = '#b00020';
+    statusEl.style.color = '#ff6b6b';
     statusEl.textContent = `${side} ${view.toUpperCase()} failed to load. Check GitHub filename.`;
   }
 
@@ -308,11 +312,20 @@
     setStatus();
   }
 
-  function updateButtons(side) {
+  function updateButtons(side){
     document.querySelectorAll(`.tl-btn[data-side="${side}"]`).forEach((btn) => {
       const active = btn.getAttribute('data-view') === current[side];
-      btn.style.background = active ? '#111' : '#fff';
-      btn.style.color      = active ? '#fff' : '#111';
+      if (active) {
+        btn.style.background = '#ffffff';
+        btn.style.color      = '#0a0a0a';
+        btn.style.borderColor = '#ffffff';
+        btn.style.fontWeight = '600';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color      = 'rgba(255,255,255,0.78)';
+        btn.style.borderColor = 'rgba(255,255,255,0.22)';
+        btn.style.fontWeight = '500';
+      }
     });
   }
 

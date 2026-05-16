@@ -76,14 +76,13 @@
     }
   };
 
-  // Exocad-style enamel — warm yellow, glossy clearcoat, still readable in shadow.
-  // baseColorFactor in linear space so it matches glTF/model-viewer reference output.
-  const ENAMEL_COLOR     = (new THREE.Color()).setRGB(0.82, 0.62, 0.07, THREE.LinearSRGBColorSpace);
+  // Exocad-style enamel — deeper saturated yellow, glossy clearcoat, strong shadow contrast.
+  const ENAMEL_COLOR     = (new THREE.Color()).setRGB(0.95, 0.62, 0.04, THREE.LinearSRGBColorSpace);
   const ENAMEL_METALNESS = 0.0;
-  const ENAMEL_ROUGHNESS = 0.32;
-  const ENAMEL_CLEARCOAT = 0.55;
-  const ENAMEL_CLEARCOAT_ROUGHNESS = 0.18;
-  const ENAMEL_SHEEN_COLOR = new THREE.Color('#fff2b8'); // subtle warm highlight tip
+  const ENAMEL_ROUGHNESS = 0.30;
+  const ENAMEL_CLEARCOAT = 0.65;
+  const ENAMEL_CLEARCOAT_ROUGHNESS = 0.16;
+  const ENAMEL_SHEEN_COLOR = new THREE.Color('#fff2b8');
 
   const statusEl = document.getElementById('tl-status');
   const current  = { FP1: 'both', FP3: 'both' };
@@ -127,7 +126,7 @@
         sheenColor: ENAMEL_SHEEN_COLOR,
         sheenRoughness: 0.55,
         reflectivity: 0.6,
-        envMapIntensity: 0.45,   // toned down so the directional key actually creates contrast
+        envMapIntensity: 0.22,   // very low — lets directional key dominate so shadows go deep
         flatShading: false
       });
       o.castShadow = true;
@@ -146,7 +145,7 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping; // punchier highlights
-    renderer.toneMappingExposure = 1.0;
+    renderer.toneMappingExposure = 0.95;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     const w0 = stage.clientWidth, h0 = stage.clientHeight;
@@ -159,14 +158,14 @@
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-    // Exocad-style lighting:
-    //   • Low ambient so shadows stay readable
-    //   • Strong key from above-front for hot highlight + clear cusp shadows
-    //   • Cooler back-rim to define silhouette
-    //   • Warm fill from below to lift the gingival side without flattening
-    scene.add(new THREE.AmbientLight(0xffffff, 0.32));
+    // Punchy lighting:
+    //   • Very low ambient → dark valleys, deep shadow in grooves
+    //   • Strong key from above-front → hot highlights on cusps
+    //   • Cool back-rim defines silhouette
+    //   • No warm bottom fill (keeping shadows dark)
+    scene.add(new THREE.AmbientLight(0xffffff, 0.16));
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.55);
+    const key = new THREE.DirectionalLight(0xffffff, 2.10);
     key.position.set(1.2, 3.5, 2.4);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
@@ -175,13 +174,9 @@
     scene.add(key);
     scene.add(key.target);
 
-    const rim = new THREE.DirectionalLight(0xbcd2ff, 0.55);
+    const rim = new THREE.DirectionalLight(0xbcd2ff, 0.35);
     rim.position.set(-2.5, 1.5, -2.0);
     scene.add(rim);
-
-    const warmFill = new THREE.DirectionalLight(0xffd58a, 0.35);
-    warmFill.position.set(0.5, -2.0, 1.5);
-    scene.add(warmFill);
 
     const camera = new THREE.PerspectiveCamera(35, w0 / Math.max(1, h0), 0.01, 5000);
     camera.position.set(0, 0, 200); // re-framed once models load

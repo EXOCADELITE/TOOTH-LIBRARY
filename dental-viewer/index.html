@@ -4,7 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FP1 / FP3 Dental Articulation Viewer</title>
-  <style>html,body{margin:0;padding:0;background:#fff;}body{padding:24px 0;}</style>
+  <style>
+    /* Transparent so this page can be iframed onto any background without showing white/dark bands. */
+    html, body { margin:0; padding:0; background:transparent !important; }
+    body { padding:24px 0; }
+  </style>
 </head>
 <body>
 <!--
@@ -21,7 +25,7 @@
   Drop this entire block into a Carrd "Embed" element. Nothing else required.
 -->
 
-<div id="tl-viewer-root" style="width:100%;max-width:1200px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;text-align:center;color:#222;">
+<div id="tl-viewer-root" style="width:100%;max-width:1200px;margin:0 auto;background:transparent;font-family:Arial,Helvetica,sans-serif;text-align:center;color:#222;">
   <div style="display:flex;gap:24px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
     <!-- FP1 -->
     <div style="flex:1;min-width:320px;max-width:560px;">
